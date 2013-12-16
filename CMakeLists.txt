@@ -13,6 +13,18 @@
 #   libOpenMM[_d].so
 #   libOpenMM_static[_d].a
 #----------------------------------------------------
+option(UG4 "Sets the path in which annlib shall be searched." OFF)
+message(STATUS "Base path to ug4 trunk: " ${UG4})
+
+if(NOT UG4)
+   message("UG4 not enabled.")
+elseif(NOT UG4)
+   message("UG4 enabled.")
+endif(NOT UG4)
+
+set(UG4_LIBS ${UG4}/lib/libug4.so)
+set(UG4_INCLUDES ${UG4}/ugbase/)
+
 
 # Don't create a new project name if this is part of a mega-build from the
 # parent directory
@@ -291,6 +303,20 @@ IF(OPENMM_BUILD_C_AND_FORTRAN_WRAPPERS)
         ADD_DEPENDENCIES(${STATIC_TARGET} ApiWrappers)
     ENDIF(OPENMM_BUILD_STATIC_LIB)
 ENDIF(OPENMM_BUILD_C_AND_FORTRAN_WRAPPERS)
+
+# link again ug4
+IF(UG4)
+  TARGET_LINK_LIBRARIES(${SHARED_TARGET} ${UG4_LIBS})
+  IF(OPENMM_BUILD_STATIC_LIB)
+    TARGET_LINK_LIBRARIES(${STATIC_TARGET} ${UG4_LIBS})
+  ENDIF(OPENMM_BUILD_STATIC_LIB)
+ENDIF(UG4)
+
+# add includes to ug4
+IF(UG4)
+   include_directories(${UG4_INCLUDES})
+   message(STATUS "UG4 includes: " ${UG4_INCLUDES})
+ENDIF(UG4)
 
 # On Linux need to link to libdl
 FIND_LIBRARY(DL_LIBRARY dl)
